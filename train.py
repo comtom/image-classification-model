@@ -1,6 +1,7 @@
 import sys
 import os
 import csv
+import multiprocessing
 
 import numpy as np
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
@@ -36,6 +37,8 @@ filter2_size = (2, 2)
 pool_size = (2, 2)
 classes = 5
 learning_rate = 0.001
+workers = multiprocessing.cpu_count()
+shuffle = True
 
 augmented_data = ImageDataGenerator(
     rescale=1. / 255,
@@ -93,8 +96,8 @@ snn = cnn.fit_generator(
     validation_data=test_generator,
     validation_steps=validation_steps,
     verbose=2,
-    shuffle=True,
-    workers=4,
+    shuffle=shuffle,
+    workers=workers,
     callbacks=[tensorboard],
 )
 
