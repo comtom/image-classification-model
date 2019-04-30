@@ -18,8 +18,8 @@ training_data = './data/train'
 test_data = './data/test'
 
 epochs = 16
-width, height = 128, 128
-batch_size = 500
+width, height = 60, 60
+batch_size = 20
 steps = 500
 validation_steps = 200
 conv1_filters = 60
@@ -34,7 +34,7 @@ augmented_data = ImageDataGenerator(
     rescale=1. / 255,
     shear_range=0.3,
     zoom_range=0.1,
-    horizontal_flip=True
+    horizontal_flip=True,
 )
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
@@ -76,7 +76,7 @@ cnn.summary()
 cnn.compile(
     loss='categorical_crossentropy',
     optimizer=optimizers.Adam(lr=learning_rate),
-    metrics=['accuracy']
+    metrics=['accuracy'],
 )
 
 snn = cnn.fit_generator(
@@ -93,8 +93,8 @@ snn = cnn.fit_generator(
 
 print(entrenamiento_generador.class_indices)
 
-target_dir = './modelo'
+target_dir = './model'
 if not os.path.exists(target_dir):
     os.mkdir(target_dir)
-cnn.save(os.path.join(target_dir, '/modelo.h5'))
-cnn.save_weights(os.path.join(target_dir, '/pesos.h5'))
+cnn.save(os.path.join(target_dir, '/model.h5'))
+cnn.save_weights(os.path.join(target_dir, '/weights.h5'))
