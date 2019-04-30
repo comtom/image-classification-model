@@ -14,10 +14,17 @@ from tensorflow.python.keras.callbacks import TensorBoard
 
 K.clear_session()
 
-training_data = './data/train'
-test_data = './data/test'
+tensorboard = TensorBoard(
+    log_dir='logs/',
+    histogram_freq=0,
+    write_graph=True,
+    write_images=True,
+)
 
-epochs = 16
+training_data = 'data/train/'
+test_data = 'data/test/'
+
+epochs = 2
 width, height = 60, 60
 batch_size = 20
 steps = 500
@@ -39,16 +46,16 @@ augmented_data = ImageDataGenerator(
 
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 
-entrenamiento_generador = augmented_data.flow_from_directory(
+train_generator = augmented_data.flow_from_directory(
     training_data,
-    target_size=(height, width),
+    target_size=(width, height),
     batch_size=batch_size,
     class_mode='categorical',
 )
 
-validacion_generador = test_datagen.flow_from_directory(
+test_generator = test_datagen.flow_from_directory(
     test_data,
-    target_size=(height, width),
+    target_size=(width, height),
     batch_size=batch_size,
     class_mode='categorical',
 )
@@ -80,21 +87,21 @@ cnn.compile(
 )
 
 snn = cnn.fit_generator(
-    entrenamiento_generador,
+    train_generator,
     steps_per_epoch=steps,
     epochs=epochs,
-    validation_data=validacion_generador,
+    validation_data=test_generator,
     validation_steps=validation_steps,
     verbose=2,
     shuffle=True,
-    workers=5,
-    # callbacks=tensorboard,
+    workers=4,
+    callbacks=[tensorboard],
 )
 
-print(entrenamiento_generador.class_indices)
+print(train_generator.class_indices)
 
-target_dir = './model'
+target_dir = 'model/'
 if not os.path.exists(target_dir):
     os.mkdir(target_dir)
-cnn.save(os.path.join(target_dir, '/model.h5'))
-cnn.save_weights(os.path.join(target_dir, '/weights.h5'))
+cnn.save(os.path.join(target_dir, 'model.h5'))
+cnn.save_weights(os.path.join(target_dir, 'weights.h5'))
