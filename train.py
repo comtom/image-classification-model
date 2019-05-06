@@ -15,15 +15,9 @@ from tensorflow.python.keras.callbacks import TensorBoard
 
 K.clear_session()
 
-tensorboard = TensorBoard(
-    log_dir='logs/',
-    histogram_freq=0,
-    write_graph=True,
-    write_images=True,
-)
-
-training_data = 'data/train/'
-test_data = 'data/test/'
+dimension = '128px'
+training_data = f'data/train{dimension}/'
+test_data = f'data/test{dimension}/'
 
 epochs = 2
 width, height = 60, 60
@@ -39,6 +33,23 @@ classes = 5
 learning_rate = 0.001
 workers = multiprocessing.cpu_count()
 shuffle = True
+
+# check if data dirs are okay and fix if needed
+if not os.path.exists('data'):
+    os.mkdir('data')
+for directory in [training_data, test_data, f'data/validation{dimension}']:
+    if not os.path.exists(directory):
+        os.mkdir(directory)
+        for i in range(classes):
+            os.mkdir(os.path.join(directory, str(i)))
+
+
+tensorboard = TensorBoard(
+    log_dir='logs/',
+    histogram_freq=0,
+    write_graph=True,
+    write_images=True,
+)
 
 augmented_data = ImageDataGenerator(
     rescale=1. / 255,
@@ -89,22 +100,26 @@ cnn.compile(
     metrics=['accuracy'],
 )
 
-snn = cnn.fit_generator(
-    train_generator,
-    steps_per_epoch=steps,
-    epochs=epochs,
-    validation_data=test_generator,
-    validation_steps=validation_steps,
-    verbose=2,
-    shuffle=shuffle,
-    workers=workers,
-    callbacks=[tensorboard],
-)
+try:
+    snn = cnn.fit_generator(
+        train_generator,
+        steps_per_epoch=steps,
+        epochs=epochs,
+        validation_data=test_generator,
+        validation_steps=validation_steps,
+        verbose=2,
+        shuffle=shuffle,
+        workers=workers,
+        callbacks=[tensorboard],
+    )
+except IndexError:
+    print('ERROR: There are no images in data subdirectories')
+else:
+    print(train_generator.class_indices)
 
-print(train_generator.class_indices)
+    target_dir = 'model/'
+    if not os.path.exists(target_dir):
+        os.mkdir(target_dir)
 
-target_dir = 'model/'
-if not os.path.exists(target_dir):
-    os.mkdir(target_dir)
-cnn.save(os.path.join(target_dir, 'model.h5'))
-cnn.save_weights(os.path.join(target_dir, 'weights.h5'))
+    cnn.save(os.path.join(target_dir, 'model.h5'))
+    cnn.save_weights(os.path.join(target_dir, 'weights.h5'))

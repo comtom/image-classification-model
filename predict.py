@@ -5,6 +5,7 @@ from tensorflow.python.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.python.keras.models import load_model
 
 
+dimension = '128px'
 width, height = 128, 128
 model = 'model/model.h5'
 model_weights = 'model/weights.h5'
@@ -27,7 +28,7 @@ def predict(path, filename):
 
 
 if __name__ == 'main':
-    for f in os.walk('data/validation128px'):
+    for f in os.walk(f'data/validation{dimension}'):
         for file in f[2]:
-            path = f'data/validation128px/{file}'
+            path = f'data/validation{dimension}/{file}'
             predict(path, f'{file}')
