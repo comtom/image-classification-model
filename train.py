@@ -19,10 +19,10 @@ dimension = '128px'
 training_data = f'data/train{dimension}/'
 test_data = f'data/test{dimension}/'
 
-epochs = 2
-width, height = 60, 60
-batch_size = 20
-steps = 500
+epochs = 8
+width, height = 128, 128
+batch_size = 200
+steps = 200
 validation_steps = 200
 conv1_filters = 60
 conv2_filters = 40
@@ -52,13 +52,15 @@ tensorboard = TensorBoard(
 )
 
 augmented_data = ImageDataGenerator(
-    rescale=1. / 255,
-    shear_range=0.3,
-    zoom_range=0.1,
+    #rescale=1. / 255,
+    shear_range=0.1,
+    #zoom_range=0.1,
     horizontal_flip=True,
 )
 
-test_datagen = ImageDataGenerator(rescale=1. / 255)
+test_datagen = ImageDataGenerator(
+    #rescale=1. / 255
+)
 
 train_generator = augmented_data.flow_from_directory(
     training_data,
@@ -88,8 +90,8 @@ cnn.add(Convolution2D(conv2_filters, filter2_size,
 cnn.add(MaxPooling2D(pool_size=pool_size))
 
 cnn.add(Flatten())
-cnn.add(Dense(512, activation='relu'))
 cnn.add(Dense(256, activation='relu'))
+cnn.add(Dense(128, activation='relu'))
 cnn.add(Dense(classes, activation='softmax'))
 
 cnn.summary()

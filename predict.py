@@ -22,13 +22,14 @@ def predict(path, filename):
     array = cnn.predict(x)
     result = array[0]
     answer = np.argmax(result)
-
-    print(f'{filename} - Class: {answer}')
     return answer
 
 
-if __name__ == 'main':
+if __name__ == '__main__':
     for f in os.walk(f'data/validation{dimension}'):
         for file in f[2]:
             path = f'data/validation{dimension}/{file}'
-            predict(path, f'{file}')
+            
+            answer = predict(path, f'{file}')
+            if answer != 0:
+                print(f'{file} - Class: {answer}')
