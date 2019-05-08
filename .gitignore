@@ -129,3 +129,7 @@ dmypy.json
 
 #logs
 logs
+
+# model and data
+model
+data
